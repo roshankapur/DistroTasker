@@ -8,8 +8,8 @@
 		<version>4.0.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.distrotasker</groupId>
-	<artifactId>distrotasker</artifactId>
+	<groupId>kapur</groupId>
+	<artifactId>demo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name/>
 	<description/>

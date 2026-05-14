@@ -1,7 +1,6 @@
 # **Java Engineering 401: DistroTasker Live Frontend**
 
-Line spacing: 1.25  
-You’ve built the **Heart** (101), the **Shield** (201), and the **Memory** (301). Now, we give DistroTasker a **Face**. In the professional world, a backend without a dashboard is just a black box. Today, you move from testing with Postman to building a real-time monitoring interface.  
+You've built the **Heart** (101), the **Shield** (201), and the **Memory** (301). Now, we give DistroTasker a **Face**. In the professional world, a backend without a dashboard is just a black box. Today, you move from testing with Postman to building a real-time monitoring interface.  
 **Strict Rule:** No React, No Vue, No Angular. We are using **Vanilla HTML, CSS, and JavaScript**. If you can't manipulate the DOM yourself, you don't actually understand the web.
 
 ## **1\. The Goal: The "Observer" Dashboard**
@@ -21,6 +20,17 @@ Build a clean HTML table that maps to your Task model from 301\. Your JavaScript
 * **Business Reason:** The operations team needs a "birds-eye view" of all scheduled work without looking at database logs.  
 * **Engineering Reason:** You must learn to map JSON responses from your Spring Boot API to dynamic DOM elements using document.createElement or template literals.
 
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ Inserted by opus to fill in missing components avoiding functionality failure   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+BACKWARD REFERENCE:
+The JSON structure you are consuming here maps directly to your TaskDTO (or Task
+entity if you skipped the DTO pattern) from 301. The fields in the API response
+are the same ones you defined in your model. Your JavaScript is simply the
+presentation layer for data that already exists.
+```
+
 ## **3\. Task 2: Polling & Traffic Math**
 
 Instead of making the user hit "Refresh," implement a setInterval in JavaScript that fetches the task list every 5 seconds.  
@@ -32,14 +42,42 @@ If you have 100 users (N) watching the dashboard with a polling interval of 1 se
 
 Create a simple form to POST a new task (Name, Script Path, Schedule Time).
 
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ Inserted by opus to fill in missing components avoiding functionality failure   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+MODEL EVOLUTION — THE "NAME" FIELD:
+The form above references a "Name" field, but your Task model from 101 only has:
+UUID id, String scriptPath, LocalDateTime scheduledTime, TaskStatus status.
+
+Add a String name field to your Task entity now. This gives tasks a human-readable
+label for the dashboard. Update your JPA entity, DTO (if used), and POST endpoint
+in the 301 backend accordingly.
+```
+
 * **Business Reason:** To move from a "Developer Tool" (Postman) to a "Product" (Dashboard).  
 * **Engineering Reason:** You must handle JSON.stringify() and set the correct headers (Content-Type: application/json) in the fetch() API.
 
 ## **5\. Mandatory Logic Check: The Hydration Bridge**
 
-In your 301 Java Backend, you must now implement the **Hydration Logic**. When the app starts, it shouldn't just sit there. It must query the DB for any PENDING tasks and re-submit them to the ScheduledExecutorService.
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ Inserted by opus to fill in missing components avoiding functionality failure   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+HYDRATION REFINEMENT (UPGRADING FROM 301):
+In 301, you implemented startup recovery using @PostConstruct or
+CommandLineRunner. Now refine that approach: replace it with an
+ApplicationReadyEvent listener. This event fires AFTER the entire Spring context
+(including your executor, JPA repos, and datasource) is fully initialized.
 
-* **Expert Tip:** Use the ApplicationReadyEvent in Spring Boot to trigger this process.
+This avoids a subtle bug where @PostConstruct tries to query the DB before the
+datasource is ready. The upgrade from @PostConstruct → ApplicationReadyEvent is
+a deliberate incremental improvement, not a contradiction with 301.
+```
+
+In your 301 Java Backend, the **Hydration Logic** must query the DB for any PENDING tasks and re-submit them to the ScheduledExecutorService.
+
+* **Expert Tip:** Use the `ApplicationReadyEvent` in Spring Boot to trigger this process.
 
 ### **Expert Tip: The "CORS" Wall**
 

@@ -3,6 +3,16 @@
 Welcome back. You’ve built the "Heart"—the tasks are running. But in the real world, "it works" isn't enough. In the real world, users are malicious or incompetent, and systems have limits. If a user submits 10,000 tasks at once, your 101 engine will crash the JVM or melt the CPU.  
 In 201, we build the **Shield**. We are moving from "Just execute it" to "Traffic Shaping."
 
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ Inserted by opus to fill in missing components avoiding functionality failure   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+BACKWARD REFERENCE:
+Your TaskSchedulerService and MockTaskRepository from 101 remain unchanged — we
+are wrapping them with new protective layers. Think of 201 as adding armor around
+the engine you already built, not replacing any parts.
+```
+
 ## **1\. Professional Shielding vs. Naive Execution**
 
 | Feature | Naive (101) | Professional (201)   |
@@ -30,6 +40,22 @@ While the ScheduledExecutorService handles the queue, we need a hard limit on ho
 **Engineering Reason:** Context Switching. If you have 4 CPU cores and try to run 100 intensive scripts, the CPU spends more time switching between them than doing work. Use a java.util.concurrent.Semaphore to limit *active* executions.  
 **Your Goal:** Wrap the task execution logic in the TaskSchedulerService with a Semaphore. Acquire before running, release in a finally block.
 
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ Inserted by opus to fill in missing components avoiding functionality failure   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+SEMAPHORE BEHAVIOUR UNDER SPRING (HEADS-UP FOR 301):
+When you transition to Spring Boot in 301, you will still create and manage your
+own ScheduledExecutorService — Spring's @Async / TaskExecutor is a separate
+mechanism. Your Semaphore wrapping stays exactly as built here; it wraps the
+execution inside the executor's submitted Runnable.
+
+Do not let Spring's thread management confuse your concurrency model — your
+executor and semaphore are complementary layers, not competing ones. In 301, your
+TaskSchedulerService becomes a @Service bean, but the internal threading logic
+(executor + semaphore) does not change.
+```
+
 ## **4\. Task 3: The "Resilient" Retry Logic**
 
 Scripts fail. Network blips happen. We shouldn't just give up. However, retrying immediately is a recipe for a "Thundering Herd" problem.  
@@ -42,6 +68,25 @@ The wait time for retry attempt \\(n\\) is:
 \\\[ WaitTime \= Base \\times 2^{n} \\\]  
 **Your Goal:** Update your TaskStatus logic. If a task fails, re-schedule it with an incremented retry count and a longer delay.
 
-**Expert Tip: The "Thread-Safe" Trap** When implementing the Token Bucket, don't just use int tokens. You’re in a multi-threaded environment. Use AtomicInteger or proper synchronized blocks. If two threads check for a token at the same microsecond, they might both think they got the last one. That’s a Race Condition. Be better than that.
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ Inserted by opus to fill in missing components avoiding functionality failure   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+MODEL EVOLUTION — EXTEND YOUR TASK FROM 101:
+Before implementing retry, you must add two new fields to your Task model:
+  - int retryCount  (default 0)  — tracks how many times this task has retried
+  - int maxRetries  (default 3)  — the ceiling for automatic recovery attempts
 
-**Graduation Requirement:** Run a load test. Submit 50 tasks with a rate limit of 5 per second and a concurrency limit of 2\. Your logs should show the 45 tasks being rejected or queued properly, and only 2 scripts ever running at the exact same moment.
+Without these fields, your retry logic has no memory of previous attempts and
+cannot enforce a maximum. Update the Task class, its constructor, and any
+repository logic that persists/reads tasks.
+```
+
+**Expert Tip: The "Thread-Safe" Trap**
+
+* When implementing the Token Bucket, don't just use `int tokens`. You're in a multi-threaded environment.
+* Use `AtomicInteger` or proper `synchronized` blocks.
+* If two threads check for a token at the same microsecond, they might both think they got the last one. That's a **Race Condition**.
+* Be better than that.
+
+**Graduation Requirement:** Run a load test. Submit 50 tasks with a rate limit of 5 per second and a concurrency limit of 2. Your logs should show that only 5 tasks are accepted per second into the queue, while a maximum of 2 scripts are physically executing at the same time. Any tasks exceeding the rate limit should be rejected with a `RateLimitExceededException`.

@@ -36,7 +36,7 @@ This is where the magic happens. You must use Java's ScheduledExecutorService.
 
 * Create a TaskSchedulerService.  
 * It should have a method: schedule(Task task).  
-* Calculate the delay: $$Delay \= ScheduledTime \- CurrentTime$$.  
+* Calculate the delay: $$Delay = ScheduledTime - CurrentTime$$.  
 * Submit the task to the executor to run after that delay.
 
 **Business Reason:** Tasks represent expensive operations (scripts). We can't let one long-running script block the entire system.  

@@ -21,6 +21,7 @@ public interface TaskRepository {
     void save(Task task);
     Task findByID(UUID id);
     List<Task> findAll();
+    List<Task> findPending();
     void deleteById(UUID id);
     //add update functions
     void updateScriptPath(UUID id, String newScriptPath);

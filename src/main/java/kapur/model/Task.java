@@ -14,5 +14,5 @@ public class Task {
     private String scriptPath;
     private LocalDateTime scheduledTime;
     private TaskStatus status;
-
+    //might have to write run function through class Task implements Runnable to use in thread pool
 }

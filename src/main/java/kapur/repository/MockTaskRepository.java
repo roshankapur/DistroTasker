@@ -26,13 +26,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MockTaskRepository implements TaskRepository {
     private final ConcurrentHashMap<UUID, Task> db = new ConcurrentHashMap<>();
 
+    //print statements simulating logs on each layer, modify later to actually log in a file
     @Override
     public void save(Task task){
         if(!db.containsKey(task.getId())){
             db.put(task.getId(),task);
-            System.out.println("SUCCESS SAVE FOR TASK:" + task.toString());
+            System.out.println("[SUCCESS] SAVE FOR TASK:" + task.toString());
         }else{
-            System.out.println("FAILED SAVE TASK FOR TASK: "+ task.toString());
+            System.out.println("[FAILED] SAVE TASK FOR TASK: "+ task.toString());
         }
     }
 
@@ -49,14 +50,29 @@ public class MockTaskRepository implements TaskRepository {
     public List<Task> findAll() {
         return new ArrayList<Task>(db.values());
     }
+    public List<Task> findPending(){
+        LocalDateTime now = LocalDateTime.now();
+        List<Task> dueTasks = new ArrayList<>();
+
+        /**consider adding a condition to check WHEN the task is pending
+         * before its added to the return list or maybe that's for the service to decide
+         */
+        for (Task task : db.values()) {
+            if (task.getStatus() == TaskStatus.PENDING) {
+                dueTasks.add(task);
+            }
+        }
+
+        return dueTasks;
+    }
 
     @Override
     public void deleteById(UUID id){
         if(db.containsKey(id)){
             db.remove(id);
-            System.out.println("DELETED TASK WITH UUID: " + id);
+            System.out.println("[DELETED] TASK WITH UUID: " + id);
         }else{
-            System.out.println("CANNOT DELETE, DID NOT FIND TASK WITH UUID:" + id);
+            System.out.println("[FAILED] CANNOT DELETE, deleteById DID NOT FIND TASK WITH UUID:" + id);
         }
     }
 
@@ -64,9 +80,9 @@ public class MockTaskRepository implements TaskRepository {
     public void updateScriptPath(UUID id, String newScriptPath){
         if(db.containsKey(id)){
             db.get(id).setScriptPath(newScriptPath);
-            System.out.println("SET scriptPath TO " + newScriptPath + " FOR TASK WITH UUID: " + id);
+            System.out.println("[SUCCESS] SET scriptPath TO " + newScriptPath + " FOR TASK WITH UUID: " + id);
         }else {
-            System.out.println("CANNOT UPDATE, DID NOT FIND TASK WITH UUID:" + id);
+            System.out.println("[FAILED] CANNOT UPDATE, updateScriptPath DID NOT FIND TASK WITH UUID:" + id);
         }
     }
 
@@ -74,9 +90,9 @@ public class MockTaskRepository implements TaskRepository {
     public void updateScheduledTime(UUID id, LocalDateTime newScheduledTime){
         if(db.containsKey(id)){
             db.get(id).setScheduledTime(newScheduledTime);
-            System.out.println("SET scheduledTime TO " + newScheduledTime + " FOR TASK WITH UUID: " + id);
+            System.out.println("[SUCCESS] SET scheduledTime TO " + newScheduledTime + " FOR TASK WITH UUID: " + id);
         }else {
-            System.out.println("CANNOT UPDATE, DID NOT FIND TASK WITH UUID:" + id);
+            System.out.println("[FAILED] CANNOT UPDATE, updateScheduledTime DID NOT FIND TASK WITH UUID:" + id);
         }
     }
 
@@ -84,9 +100,9 @@ public class MockTaskRepository implements TaskRepository {
     public void updateTaskStatus(UUID id, TaskStatus newTaskStatus){
         if(db.containsKey(id)){
             db.get(id).setStatus(newTaskStatus);
-            System.out.println("SET status TO " + newTaskStatus + " FOR TASK WITH UUID: " + id);
+            System.out.println("[SUCCESS] SET status TO " + newTaskStatus + " FOR TASK WITH UUID: " + id);
         }else {
-            System.out.println("CANNOT UPDATE, DID NOT FIND TASK WITH UUID:" + id);
+            System.out.println("[FAILED] CANNOT UPDATE, updateTaskStatus DID NOT FIND TASK WITH UUID:" + id);
         }
     }
 }

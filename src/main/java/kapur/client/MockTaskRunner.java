@@ -31,7 +31,7 @@ public class MockTaskRunner implements CommandLineRunner {
     public void run(String... args) throws Exception {
         System.out.println("=== MockTaskRunner: Scheduling 5 tasks ===");
 
-        for (int i = 1; i <= 5; i++) {
+        for (int i = 1; i <= TaskSchedulerService.getAvailableCoreCount()-1; i++) {
             Task task = new Task(
                     UUID.randomUUID(),
                     "/scripts/mock_job_" + i + ".sh",

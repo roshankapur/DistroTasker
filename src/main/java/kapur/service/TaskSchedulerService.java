@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 //each core can only execute one thread except in cases of "hyperthreading"
 //MockTaskRepository instance is injected by spring
 
+//investigate more threads in JVM used than available from OS and its management
 @Service
 public class TaskSchedulerService {
     private final TaskRepository taskRepository;
@@ -23,7 +24,7 @@ public class TaskSchedulerService {
 
     public TaskSchedulerService(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
-        this.scheduler = Executors.newScheduledThreadPool(4);
+        this.scheduler = Executors.newScheduledThreadPool(getAvailableCoreCount());
     }
 
     //this method will later replace hardcoded thread count in constructor
@@ -76,6 +77,16 @@ public class TaskSchedulerService {
     /** //commented out cause spring scheduling is not using ScheduledExecutorService and its threadpool
     //method used by spring to execute scheduled tasks every 2000ms
     @Scheduled (fixedRate = 2000)
-    public void pollAndExecute(){}
+    public void pollAndUpdate(){}
     */
+
+    /** TODO:
+     * simulate the error when threads are overburdened as new tasks are pushed to @scheduler.
+     * show bhai when threadpool is full and experiences task overflow
+     *
+     * frontend should schedule task
+     *
+     * expose backend through api???
+     * do api and persistence before rate limiting if dependancies allow otherwise simulate dependancies
+     */
 }

@@ -37,7 +37,7 @@ public class TaskSchedulerService {
     /**adds task marked pending to repository
      * and calls @scheduler (ScheduledExececutorService) to use executeTask() method*/
     public void scheduleTask(Task task){
-        task.setStatus(TaskStatus.PENDING);
+        task.setStatus(TaskStatus.QUEUED);
         taskRepository.save(task);
 
         //delay = scheduledTime - currentTime
@@ -45,7 +45,7 @@ public class TaskSchedulerService {
         if(delayMillis < 0) delayMillis = 0; //set past due tasks to be executed presently
 
         //print statements simulating logs on each layer, modify later to actually log in a file
-        System.out.println("[SCHEDULED] TASK WITH ID: "+task.getId()
+        System.out.println("[QUEUED] TASK WITH ID: "+task.getId()
                             +" FIRES IN "+delayMillis+"ms");
 
         //calls scheduler to append @task to internal blocking queue to be executed in @delayMillies ms

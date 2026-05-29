@@ -1,13 +1,16 @@
 package kapur.service;
 
+import jakarta.annotation.PostConstruct;
 import kapur.model.Task;
 import kapur.model.TaskStatus;
 import kapur.repository.TaskRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +37,32 @@ public class TaskSchedulerService {
         return Runtime.getRuntime().availableProcessors();
     }
 
+    /** Starup recovery /"hydration" logic
+     * runs once after Spring initializes the class
+     * DB is queried for any QUEUED tasks left over
+     * from previous run and requeues them to ScheduledExecutorService.
+     */
+    @PostConstruct
+    public void recoverTasksOnStartup() {
+        List<Task> queuedTasks = taskRepository.findByStatus(TaskStatus.QUEUED);
+
+        if (queuedTasks.isEmpty()) {
+            System.out.println("[RECOVERY] NO QUEUED TASKS FOUND. INITIATING CLEAN START");
+        }
+        else {
+            System.out.println("[RECOVERY] FOUND " + queuedTasks.size() + " TASKS QUEUED IN DB — INITIATING REQUEUED START");
+
+            for (Task task : queuedTasks) {
+                long delayMillis = Duration.between(LocalDateTime.now(), task.getScheduledTime()).toMillis();
+                if (delayMillis < 0) delayMillis = 0; //set past due tasks to be executed asap
+
+                System.out.println("[RECOVERY] TASK WITH ID: " + task.getId()
+                        + " FIRES IN" + delayMillis + "ms");
+                scheduler.schedule(() -> executeTask(task), delayMillis, TimeUnit.MILLISECONDS);
+            }
+        }
+    }
+
     /**adds task marked pending to repository
      * and calls @scheduler (ScheduledExececutorService) to use executeTask() method*/
     public void scheduleTask(Task task){
@@ -53,8 +82,13 @@ public class TaskSchedulerService {
     }
 
     //method simulating task/script execution to be used as the run() method by @scheduler
+    // @Transactional tells spring to treat function as a database transaction
+    @Transactional
     public void executeTask(Task task){
-        taskRepository.updateTaskStatus(task.getId(), TaskStatus.RUNNING);
+        Task dbTask = taskRepository.findById(task.getId()).orElseThrow();
+        dbTask.setStatus(TaskStatus.RUNNING);
+        taskRepository.save(dbTask);
+
         System.out.println("[RUNNING] TASK WITH ID: " +task.getId()
                 + " ON THREAD: " +Thread.currentThread().getName()
                 + " INITIATED AT: " + LocalDateTime.now());
@@ -65,12 +99,14 @@ public class TaskSchedulerService {
             Thread.sleep(2000);
 
             //mark completed
-            taskRepository.updateTaskStatus(task.getId(), TaskStatus.COMPLETED);
+            dbTask.setStatus(TaskStatus.COMPLETED);
+            taskRepository.save(dbTask);
             System.out.println("[COMPLETED] TASK " +task.getId()+ " ON THREAD: " +Thread.currentThread().getName());
         } catch (Exception e) {
             //mark failed
-            taskRepository.updateTaskStatus(task.getId(), TaskStatus.FAILED);
-            System.out.println("[FAILED] Task " + task.getId() + "ERROR: " + e.getMessage());
+            dbTask.setStatus(TaskStatus.FAILED);
+            taskRepository.save(dbTask);
+            System.out.println("[FAILED] Task " + task.getId() + " ERROR: " + e.getMessage());
         }
     }
 

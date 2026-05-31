@@ -4,6 +4,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 /docs/engineering_guides_review.md
+/docs/301before201implementation_plan.md
 
 ### STS ###
 .apt_generated

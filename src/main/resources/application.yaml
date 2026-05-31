@@ -5,12 +5,12 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/distrotasker
     username: postgres
-    password: <password_holder>
+    password: do1Not3Redeem
 
   jpa:
     hibernate:
       ddl-auto: update  #DDL is data definition language - ie. tables are autocreated based on java entities
-    show-sql: true      #hibernate will generate sql for the ddl, and also print to console
+    show-sql: false     #hibernate will generate sql for the ddl, and also print to console
     properties:
       hibernate:
         format_sql: true #Formats SQL logs to be readable/verbose
@@ -21,4 +21,3 @@ server:
 logging:
   level:
     kapur: DEBUG
-    org.hibernate.SQL: DEBUG

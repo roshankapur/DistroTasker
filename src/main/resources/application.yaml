@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: DistroTasker
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/distrotasker
+    username: postgres
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: update  #DDL is data definition language - ie. tables are autocreated based on java entities
+    show-sql: false     #hibernate will generate sql for the ddl, and also print to console
+    properties:
+      hibernate:
+        format_sql: true #Formats SQL logs to be readable/verbose
+
+server:
+  port: 8080
+
+logging:
+  level:
+    kapur: DEBUG

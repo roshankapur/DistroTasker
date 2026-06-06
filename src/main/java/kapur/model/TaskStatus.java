@@ -2,7 +2,7 @@ package kapur.model;
 
 public enum TaskStatus {
     QUEUED,
-    PENDING,
+    //PENDING,
     RUNNING,
     COMPLETED,
     FAILED

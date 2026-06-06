@@ -150,7 +150,7 @@ public class TaskSchedulerService {
      *
      * do ui also same week as rate limiting
      *
-     * user should be able to fill up text boxes with their name and saying how much
+     * user should be able to fill up text boxes with data and mention how much
      * delay they want in secs
      * and after that delay something should pop up on the ui
      * basically ui shows when task is completed
@@ -158,5 +158,7 @@ public class TaskSchedulerService {
      *
      * this is tough because frontend can call/locate backend but backend cannot
      * locate frontend
-     */
+     *
+     * also we're gonna be rate limiting at controller/api layer to avoid bs computations at service layer
+     * */
 }

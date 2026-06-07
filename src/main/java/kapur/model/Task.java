@@ -16,7 +16,6 @@ import java.util.UUID;
  *  */
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "tasks")
@@ -28,4 +27,8 @@ public class Task {
     //jpa needs to know the datatype of enum before it wires in SQL
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
+
+    //rate limiter use
+    private int retryCount = 0;
+    private int maxRetries = 3;
 }

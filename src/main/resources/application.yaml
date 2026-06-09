@@ -27,8 +27,6 @@ distrotasker:
   rate-limiter:
     capacity: 10            #max tokens
     refill-interval-ms: 5000  #tokens refill every 5 seconds (10reqs/5s != 2reqs/sec)
-  semaphore:
-    max-concurrent: 2       #restricting concurrency
   retry:
     max-retries: 3          #marks FAILED after
-    base-delay-ms: 2000     #exponential backoff (2s, 4s, 8s)
+    base-delay-ms: 1000     #exponential backoff (2s, 4s, 8s)

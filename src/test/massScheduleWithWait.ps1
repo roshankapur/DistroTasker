@@ -12,7 +12,7 @@ for ($i=1; $i -le 30; $i++) {
     }
 
     # If we've hit a multiple of 10 (and we aren't at the very end), sleep for 5 seconds
-    if ($i % 10 -eq 0 -and $i -ne 30) {
+    if ($i % 10 -eq 0) {
         Write-Host "--- Pausing for 5 seconds to let rate limiter refill ---" -ForegroundColor Cyan
         Start-Sleep -Seconds 5
     }

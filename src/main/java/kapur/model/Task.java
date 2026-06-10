@@ -22,6 +22,7 @@ import java.util.UUID;
 public class Task {
     @Id //mark as primary key
     private UUID id;
+    private String name;
     private String scriptPath;
     private LocalDateTime scheduledTime;
     //jpa needs to know the datatype of enum before it wires in SQL

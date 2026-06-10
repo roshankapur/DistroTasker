@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DistroTasker | Observer Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Ionicons for modern icons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Header Section -->
+        <header class="glass-panel header">
+            <div class="logo">
+                <ion-icon name="server-outline"></ion-icon>
+                <h1>DistroTasker <span>Observer</span></h1>
+            </div>
+            <div class="header-controls">
+                <span id="connection-status" class="status-indicator online">
+                    <span class="dot"></span> Online
+                </span>
+                <button id="refresh-btn" class="btn btn-secondary">
+                    <ion-icon name="refresh-outline"></ion-icon> Sync Now
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Grid -->
+        <main class="grid-layout">
+            
+            <!-- Left Column: Form -->
+            <section class="glass-panel form-section">
+                <div class="section-header">
+                    <h2><ion-icon name="add-circle-outline"></ion-icon> Schedule Task</h2>
+                </div>
+                <form id="task-form">
+                    <div class="input-group">
+                        <label for="taskName">Task Name</label>
+                        <input type="text" id="taskName" placeholder="e.g., Nightly Backup" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="scriptPath">Script Path</label>
+                        <input type="text" id="scriptPath" placeholder="e.g., /scripts/backup.sh" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="scheduledTime">Scheduled Time</label>
+                        <input type="datetime-local" id="scheduledTime" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="submit-btn">
+                        <ion-icon name="paper-plane-outline"></ion-icon> Deploy Task
+                    </button>
+                    <div id="form-alert" class="alert hidden"></div>
+                </form>
+            </section>
+
+            <!-- Right Column: Task List -->
+            <section class="glass-panel table-section">
+                <div class="section-header space-between">
+                    <h2><ion-icon name="list-outline"></ion-icon> Live Pulse</h2>
+                    
+                    <div class="table-controls">
+                        <div class="search-box">
+                            <ion-icon name="search-outline"></ion-icon>
+                            <input type="text" id="search-input" placeholder="Search tasks...">
+                        </div>
+                        <select id="sort-select" class="glass-select">
+                            <option value="time-desc">Time (Newest First)</option>
+                            <option value="time-asc">Time (Oldest First)</option>
+                            <option value="status">Status</option>
+                            <option value="name">Name (A-Z)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="tasks-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Script</th>
+                                <th>Scheduled Execution</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tasks-tbody">
+                            <!-- Tasks injected via JS -->
+                        </tbody>
+                    </table>
+                    <div id="empty-state" class="empty-state hidden">
+                        <ion-icon name="flask-outline"></ion-icon>
+                        <p>No tasks found. Schedule one to ignite the engine.</p>
+                    </div>
+                </div>
+            </section>
+            
+        </main>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

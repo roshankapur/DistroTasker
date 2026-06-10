@@ -1,6 +1,7 @@
 package kapur.service;
 
-import jakarta.annotation.PostConstruct;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import kapur.model.Task;
 import kapur.model.TaskStatus;
 import kapur.repository.TaskRepository;
@@ -51,7 +52,7 @@ public class TaskSchedulerService {
      * DB is queried for any QUEUED or RETRYING tasks left over
      * from previous run and requeues them to ScheduledExecutorService.
      */
-    @PostConstruct
+    @EventListener(ApplicationReadyEvent.class)
     public void recoverTasksOnStartup() {
         //list @recoverable stores all tasks recovered on server restart
         List<Task> recoverable = new java.util.ArrayList<>(taskRepository.findByStatus(TaskStatus.QUEUED));
